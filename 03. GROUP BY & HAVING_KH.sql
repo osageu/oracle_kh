@@ -1,0 +1,244 @@
+/*
+    < GROUP BY 절 >
+    그룹기준을 제시할 수 있는 구문 --> 여러 개의 값들을 하나의 그룹으로 묶어서 처리할 목적
+    
+*/
+
+SELECT TO_CHAR(SUM(SALARY), '99,999,999')
+FROM EMPLOYEE; --> 전체 사원 기준
+
+-- 각 부서별 총 급여합
+SELECT DEPT_CODE, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY DEPT_CODE
+ORDER BY DEPT_CODE NULLS FIRST;
+
+-- 각 부서별 사원수
+SELECT DEPT_CODE, COUNT(*)
+FROM EMPLOYEE
+GROUP BY DEPT_CODE;
+
+-- 각 직급별 사원수
+SELECT JOB_CODE, COUNT(*)
+FROM EMPLOYEE
+GROUP BY JOB_CODE
+ORDER BY COUNT(*);
+
+-- 각 직급별 보너스 받는 사원수
+SELECT JOB_CODE, COUNT(BONUS)
+FROM EMPLOYEE
+GROUP BY JOB_CODE
+ORDER BY 1;
+
+-- 각 직급별 급여 평균
+SELECT JOB_CODE, TO_CHAR(AVG(SALARY),'9,999,999') 평균
+FROM EMPLOYEE
+GROUP BY JOB_CODE
+ORDER BY 1;
+
+-- 각 직급별 총 사원수, 보너스 받는 사원수, 급여합, 평균급여,  최고급여, 최저급여
+SELECT JOB_CODE, COUNT(*) "총 사원수", COUNT(BONUS) "보너스 받는 사원수" , 
+            TO_CHAR(SUM(SALARY), '99,999,999') "급여합" , 
+            TO_CHAR(AVG(SALARY), '9,999,999') "급여 평균", 
+            TO_CHAR(MAX(SALARY), '9,999,999') "최고 급여", 
+            TO_CHAR(MIN(SALARY),'9,999,999') "최저 급여"
+FROM EMPLOYEE
+GROUP BY JOB_CODE
+ORDER BY 1;
+
+-- 여러 컬럼을 제시해서 그룹기준 선정 가능
+SELECT DEPT_CODE, JOB_CODE, COUNT(*), SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY DEPT_CODE, JOB_CODE
+ORDER BY DEPT_CODE;
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+/*
+    < HAVING 절 >
+    그룹에 대한 조건을 제시할 때 사용하는 구문 (주로 그룹함수한 결과를 가지고 비교수행)
+
+*/
+
+-- 부서별 평균급여가 300만원 이상인 부서들만 조회
+SELECT DEPT_CODE, FLOOR(AVG(SALARY))
+FROM EMPLOYEE
+GROUP BY DEPT_CODE HAVING FLOOR(AVG(SALARY)) >=3000000
+ORDER BY 1;
+
+-- 부서별 보너스 받는 사원이 없는 부서만을 조회
+SELECT DEPT_CODE
+FROM EMPLOYEE
+GROUP BY DEPT_CODE HAVING COUNT(BONUS) = 0;
+
+-----------------------------------------------------------------------------------------------------------------------------------
+-- 마지막 행에 전체 총 급여합까지 같이 조회
+SELECT JOB_CODE, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY ROLLUP(JOB_CODE) 
+ORDER BY 1;
+
+-- ROLLUP
+SELECT DEPT_CODE, JOB_CODE, SAL_LEVEL, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY ROLLUP(DEPT_CODE, JOB_CODE, SAL_LEVEL)
+ORDER BY 1, 2, 3;
+
+-- CUBE
+SELECT DEPT_CODE, JOB_CODE, SUM(SALARY)
+FROM EMPLOYEE
+GROUP BY CUBE (DEPT_CODE, JOB_CODE)
+ORDER BY 1;
+
+-- GROUPING
+SELECT DEPT_CODE, JOB_CODE, TO_CHAR(SUM(SALARY), '99,999,999') 급여, 
+        GROUPING(DEPT_CODE) 부서별그룹,
+        GROUPING(JOB_CODE) 직급별그룹
+FROM EMPLOYEE
+GROUP BY ROLLUP (DEPT_CODE, JOB_CODE)
+ORDER BY 1;
+
+SELECT DEPT_CODE, JOB_CODE, TO_CHAR(SUM(SALARY), '99,999,999') 급여, 
+        GROUPING(DEPT_CODE) 부서별그룹,
+        GROUPING(JOB_CODE) 직급별그룹
+FROM EMPLOYEE
+GROUP BY CUBE (DEPT_CODE, JOB_CODE)
+ORDER BY 1;
+
+-- SET OPERATION : 여러 개의 QUERY문을 가지고 하나의 QUERY문으로 만드는 연산자
+
+-- 1. UNION
+-- EMPLOYEE 테이블에서 부서코드가 D5인 사원 또는 급여가 300만원 초과인 사원들 조회
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5' OR SALARY > 3000000;
+
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5'
+UNION
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000;
+
+-- 2. UNION ALL
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, BONUS
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5'
+UNION ALL
+SELECT EMP_ID, EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000;
+
+-- 3. INTERSECT 
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5'
+INTERSECT
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000
+ORDER BY 1;
+
+-- 4. MINUS
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE DEPT_CODE = 'D5'
+MINUS
+SELECT EMP_NAME, DEPT_CODE, SALARY
+FROM EMPLOYEE
+WHERE SALARY > 3000000
+ORDER BY 1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
