@@ -1,0 +1,50 @@
+-- 1. SAMPLE 계정 생성
+CREATE USER SAMPLE IDENTIFIED BY SAMPLE;
+
+-- 2. 계정 접속 권한부여
+GRANT CREATE SESSION TO SAMPLE;
+
+-- 3. 계정 테이블 생성 권한부여 및 테이블 SPACE 할당
+GRANT CREATE TABLE TO SAMPLE;
+ALTER USER SAMPLE QUOTA 2M ON SYSTEM;
+
+-- 4. KH.EMPLOYEE 테이블을 조회(SELECT)할 수 있는 권한부여
+GRANT SELECT ON KH.EMPLOYEE TO SAMPLE;
+
+-- 5 KH.EMPLOYEE 테이블에 삽입(INSERT)할 수 있는 권한부여
+GRANT INSERT ON KH.DEPARTMENT TO SAMPLE;
+
+-- 6 ROLE 명단
+SELECT *
+FROM ROLE_SYS_PRIVS
+WHERE ROLE = 'RESOURCE';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
